@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <title>coin</title>
+    <meta charset="utf-8"/>
+    <meta http-equiv="x-ua-compatible" content="ie=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+</head>
+<style>
+body{
+    font-size:14px;
+    background-color:rgb(30,30,30);
+    color:rgb(86,156,203);
+}
+table {
+    border-collapse: collapse;
+}
+.coin-input {
+    width:50px;
+    text-align:right;
+    border: 0;
+    border-bottom: 1px dotted #333;
+    color: rgb(181,206,168); /* 215,186,125 */
+    background-color:#000;
+}
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+span {
+    font-size:11px;
+    margin-right: 20px;
+    margin-left: 20px;
+}
+.box-red {
+    color: rgb(206,145,120);
+}
+.box-blue {
+    color: rgb(156,220,254);
+}
+.box-blink-blue {
+    color: white;
+}
+#coinbox {
+    margin-left:30px;
+    margin-top:20px;
+    margin-bottom:25px;
+}
+.header-tr {
+    text-align: center;
+    color: rgb(215,186,125);
+    background-color:#262930;
+}
+.header-tr td {
+    padding:5px 30px;
+    font-size: 11px;
+}
+.coin-money {
+    text-align:right;
+}
+.coin-kind {
+    text-align:left;
+}
+.row-line td {
+    border-top:1px solid #141414
+}
+table {
+    border-top:1px solid #324572;
+    border-bottom:1px solid #141414;
+}
+table td {
+    padding:5px;
+    /* background-color: #121212; */
+}
+.btn-box {
+    padding: 30px;
+}
+.btn-box button{
+    border:1px solid #111;
+    background-color: #000;
+    color: #333;
+    font-size:11px;
+}
+.total-box {
+    color:black;
+    padding: 10px;
+}
+.font-11 {
+    color: #1f86f3;
+    font-size:11px;
+}
+.red {
+    color: rgb(215,186,125);
+}
+@media screen and (max-width:950px) {
+    /* 모바일 */
+    .mb-s2{
+        display:none
+    }
+    
+}
+
+@media screen and (max-width:720px) {
+    /* 모바일 */
+    /* #coinbox td:nth-child(n+6):nth-child(-n+8){
+        display:none
+    } */
+    .mb-s {
+        display:none
+    }
+}
+</style>
+<body>
+    <form name="frm" method="post">
+        <table id="coinbox"></table>
+    </form>
+<script>
+
+
+
+// Closure
+(function() {
+  /**
+   * Decimal adjustment of a number.
+   *
+   * @param {String}  type  The type of adjustment.
+   * @param {Number}  value The number.
+   * @param {Integer} exp   The exponent (the 10 logarithm of the adjustment base).
+   * @returns {Number} The adjusted value.
+   */
+  function decimalAdjust(type, value, exp) {
+    // If the exp is undefined or zero...
+    if (typeof exp === 'undefined' || +exp === 0) {
+      return Math[type](value);
+    }
+    value = +value;
+    exp = +exp;
+    // If the value is not a number or the exp is not an integer...
+    if (isNaN(value) || !(typeof exp === 'number' && exp % 1 === 0)) {
+      return NaN;
+    }
+    // If the value is negative...
+    if (value < 0) {
+      return -decimalAdjust(type, -value, exp);
+    }
+    // Shift
+    value = value.toString().split('e');
+    value = Math[type](+(value[0] + 'e' + (value[1] ? (+value[1] - exp) : -exp)));
+    // Shift back
+    value = value.toString().split('e');
+    return +(value[0] + 'e' + (value[1] ? (+value[1] + exp) : exp));
+  }
+
+  // Decimal round
+  if (!Math.round10) {
+    Math.round10 = function(value, exp) {
+      return decimalAdjust('round', value, exp);
+    };
+  }
+  // Decimal floor
+  if (!Math.floor10) {
+    Math.floor10 = function(value, exp) {
+      return decimalAdjust('floor', value, exp);
+    };
+  }
+  // Decimal ceil
+  if (!Math.ceil10) {
+    Math.ceil10 = function(value, exp) {
+      return decimalAdjust('ceil', value, exp);
+    };
+  }
+})();
+
+class ColorChanger {
+    constructor(type) {
+        this.type = type;
+    }
+    
+    changergb(){
+        // var r = Math.round(Math.random() * 255);
+        // var g = Math.round(Math.random() * 255);
+        
+        var r = 206;
+        var g = Math.round(Math.random() * 128) + 127;
+        var b = Math.round(Math.random() * 255);
+        
+        // 블루계열색
+        if(this.type==='b'){
+            r = 156
+            b = 254
+        }
+
+        var selector = 'box-blink-red'
+            selector = this.type==='b' ? 'blink-money' : selector;
+        var color = "rgb(" + r + "," + g + "," + b + ")";
+        var ln = $('.' + selector).length
+        var rn = Math.round((Math.random() * ln) )
+    
+        $('.' + selector + ':eq(' + rn + ')').css('color', color)
+    }
+}
+
+class CoinTable {
+    constructor() {
+        this.coin = [
+            {keyNm:'BTC', key:'BTC', name:'BTC', quantity: 0, getPrice: 10000 },
+            {keyNm:'STRIKE', key:'STRIKE', name:'STRIKE', quantity: 1172, getPrice: 12379 },
+            {keyNm:'IQ', key:'IQ', name:'IQ', quantity: 1137644, getPrice: 11.11 },
+            {keyNm:'XEM', key:'XEM', name:'XEM', quantity: 210300, getPrice: 45.53 },
+            {keyNm:'KAVA', key:'KAVA', name:'KAVA', quantity: 9134, getPrice: 714.3 },
+            {keyNm:'XRP', key:'XRP', name:'XRP' , quantity: 0, getPrice: 15400000 },
+            {keyNm:'DOGE', key:'DOGE', name:'DOGE' , quantity: 0, getPrice: 20000000 },
+        ]
+
+        this.coinMapp = {}
+        this.coinBoxHtml = '';
+        this.coin.forEach(v=>{
+            this.coinMapp[v.keyNm] = v.average
+            this.coinBoxHtml += '<div><span><input type="number" name="' + v.keyNm + '" id="' + v.keyNm + '" value="" placeholder="' + v.name + '" class="coin-input" />' + v.name + '</span></div>'
+        })
+
+        $("#coin-input-box").html(this.coinBoxHtml)
+
+        this.coin.forEach(v=>{
+            $("#" + v.keyNm).val(this.coinMapp[v.keyNm])
+        })
+
+        this.dataSet = {}
+    }
+
+    async coinGet(v){
+        return await $.get('https://crix-api-endpoint.upbit.com/v1/crix/candles/days/?code=CRIX.UPBIT.KRW-' + v.key , function(d){
+            // console.log(v.name, d[0].openingPrice, d[0].tradePrice, d[0].openingPrice < d[0].tradePrice)
+            return d
+        })
+    }
+
+    AddComma(num){
+        var regexp = /\B(?=(\d{3})+(?!\d))/g;
+        num = Math.round10(num, -2)
+        return num.toString().replace(regexp, ',');
+    }
+
+    coinMaker() {
+    
+        var html = '';
+            html += '<tr align="center" class="header-tr">';
+            html += '    <td colspan="2">종목</td>';
+            html += '    <td>현재가</td>';
+            html += '    <td colspan="2">오름/내림</td>';
+            html += '    <td class="mb-s">금액</td>';
+            html += '    <td class="mb-s"></td>';
+            html += '</tr>';
+
+        var total = 0
+        var totalDiffMoney = 0
+        var totalMaxMoney = 0
+
+        this.coin.forEach((v)=>{
+            this.coinMapp[v.keyNm] = $("#" + v.keyNm).val()
+            var data = this.coinGet(v)
+            var _this = this;
+            data.then(function(d){
+                _this.dataSet[v.keyNm] = d
+            })
+        })
+
+        this.coin.forEach((v,k)=>{
+            var d = this.dataSet[v.keyNm]
+            
+            if(d === undefined) return
+
+            var bool = d[0].openingPrice < d[0].tradePrice
+            var money = Math.ceil(v.quantity * d[0].tradePrice)
+            var diffMoney = money - v.getPrice
+            var rowspan = ''
+            var rowsBool = true
+            var lineClass = ''
+            var maxMoney = Math.floor(v.average * v.quantity);
+            var plusClass = ''
+            if( this.coin[k + 1] !== undefined && v.key === this.coin[k + 1].key && ( this.coin[k - 1] !== undefined &&  v.key !== this.coin[k - 1].key)  ){
+                rowspan = ' rowspan="2" '
+            }else if(this.coin[k - 1] !== undefined && v.key === this.coin[k - 1].key){
+                rowsBool = false
+            }
+
+            if( (this.coin[k - 1] !== undefined && v.key !== this.coin[k - 1].key) || this.coin[k - 1] === undefined) lineClass = 'row-line'
+            
+            if(money > 10000) plusClass = 'red'
+            
+            html += '<tr class="' + lineClass + '">'
+            html += '<td class="coin-kind">' + v.name + ' </td>'
+            html += rowsBool ? '<td class="coin-money font-11"' + rowspan + '> '+ v.key +'</td>' : ''
+            html += rowsBool ? '<td class="coin-money"' + rowspan + '> '+ this.AddComma(d[0].tradePrice) +'원 </td>' : ''
+            html += rowsBool ? '<td class="coin-money" ' + rowspan + '>' + '( ' + this.AddComma( d[0].tradePrice - d[0].openingPrice ) + '원 )<span class="' + ( bool ? 'box-blink-red' : 'box-blink-blue' ) +'">' + ( bool ? '올랐다' : '내렸다') + '</span> </td>' : ''
+            html += rowsBool ? '<td class="coin-money"' + rowspan + '> '+ this.AddComma(v.quantity === 0 ? 0 : v.getPrice) +'원 </td>' : ''
+            html += rowsBool ? `<td class="coin-money" ${rowspan}>${v.quantity === 0 ? 0 : (this.AddComma(d[0].tradePrice - v.getPrice))}원 </td>` : ''
+            html += '</tr>'
+
+        })
+        
+        $("#coinbox").html(html)
+    }
+}
+
+
+
+
+const coinTable = new CoinTable();
+
+coinTable.coinMaker();
+
+var id = setInterval(()=>{
+    coinTable.coinMaker()
+}, 1000);
+
+setInterval(() => {
+    const c1 = new ColorChanger();
+    const c2 = new ColorChanger('b');
+    c1.changergb()
+    c2.changergb()
+},50)
+var itotal=0
+for(var i=1; i<=100; i++){
+    itotal += i
+    console.log(i, itotal)
+}
+
+</script>
+</body>
+</html>
