@@ -252,6 +252,7 @@ class CoinTable {
             html += '    <td colspan="2">오름/내림</td>';
             html += '    <td class="mb-s">금액</td>';
             html += '    <td class="mb-s"></td>';
+            html += '    <td class="mb-s"></td>';
             html += '</tr>';
 
         var total = 0
@@ -297,6 +298,7 @@ class CoinTable {
             html += rowsBool ? '<td class="coin-money" ' + rowspan + '>' + '( ' + this.AddComma( d[0].tradePrice - d[0].openingPrice ) + '원 )<span class="' + ( bool ? 'box-blink-red' : 'box-blink-blue' ) +'">' + ( bool ? '올랐다' : '내렸다') + '</span> </td>' : ''
             html += rowsBool ? '<td class="coin-money"' + rowspan + '> '+ this.AddComma(v.quantity === 0 ? 0 : v.getPrice) +'원 </td>' : ''
             html += rowsBool ? `<td class="coin-money" ${rowspan}>${v.quantity === 0 ? 0 : (this.AddComma(d[0].tradePrice - v.getPrice))}원 </td>` : ''
+            html += rowsBool ? `<td class="coin-money" ${rowspan}>${v.quantity === 0 ? 0 : (this.AddComma((d[0].tradePrice - v.getPrice) / d[0].tradePrice * 100))}</td>` : ''
             html += '</tr>'
 
         })
